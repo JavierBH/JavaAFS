@@ -3,14 +3,26 @@
 package afs;
 import java.rmi.*;
 import java.rmi.server.*;
+import java.io.FileNotFoundException;
+
 
 public class ViceImpl extends UnicastRemoteObject implements Vice {
     public ViceImpl() throws RemoteException {
     }
-    public ViceReader download(String fileName /* añada los parámetros que requiera */)
-          throws RemoteException {
-        return null;
+    /** 
+     * Metodo que descarga el fichero indicado del servidor.
+     * @param fileName: Nombre del archivo que se quiere descargar
+     * @param tam: Tamaño de los bloques de descarga
+     * @return Referencia a objecto ViceReader que utilizara el cliente para descargar el fichero
+     * @throws RemoteException
+     * @throws FileNotFoundException
+     */ 
+    public ViceReader download(String fileName,int tam)
+          throws RemoteException, FileNotFoundException{
+            ViceReaderImpl vr = new ViceReaderImpl(fileName,"r",tam);
+        return vr;
     }
+
     public ViceWriter upload(String fileName /* añada los parámetros que requiera */)
           throws RemoteException {
         return null;

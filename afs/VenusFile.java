@@ -24,9 +24,16 @@ public class VenusFile {
         } catch(FileNotFoundException e){
             //Si no esta en cache se descarga
             Vice download_file = (Vice)this.venus.getLookup();
-            //La descarga del archivo se debe de hacer por bloques
-            // NO estan inicados los bloques hasta que no se desarrolle la funcion download de Vice
-            download_file.download(this.fileName);
+            //Se descarga el fichero
+            ViceReader vr = download_file.download(this.fileName,(int)this.venus.getBlockSize());
+            byte [] fichero = new byte [vr.getLengthFile()]; 
+            //Se descargan todos los bloques del fichero
+            for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
+                vr.read(venus.getBlockSize(), i);
+            }
+            //Se escribe el fichero
+            f.write(fichero);
+            f.setLength(vr.getLengthFile());
             //Se abre el fichero
             this.f = new RandomAccessFile(cacheDir + fileName, mode);
         }

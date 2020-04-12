@@ -1,6 +1,7 @@
 // Clase de servidor que instancia y registra el servicio remoto
 // de acceso a ficheros.
 // NO MODIFICAR
+package servidor; //Esto faltaba y lo he peusto yo (Er JAvi) pero no se si esta bien
 import java.rmi.*;
 import java.rmi.server.*;
 import afs.*;

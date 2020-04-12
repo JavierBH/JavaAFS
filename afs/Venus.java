@@ -19,7 +19,8 @@ public class Venus {
 
     public Remote getLookup(){
         try{
-        return Naming.lookup("//" + host + ":" + port + "/Banco");
+            Remote lookup = Naming.lookup("//" + host + ":" + port + "/Banco"); 
+            return lookup;
         }
         catch (RemoteException e) {
             System.err.println("Error de comunicacion: " + e.toString());
@@ -40,8 +41,8 @@ public class Venus {
         return this.port;
     }
 
-    public String getBlockSize(){
-        return this.block_size;
+    public int getBlockSize(){
+        return Integer.parseInt(this.block_size);
     }
 }
 
