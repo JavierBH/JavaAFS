@@ -9,21 +9,26 @@ public class Venus {
     private String port;
     private String block_size;
     public Venus() {
-        try {
             // DIreccion de host de la maquina del cliente
-            host = System.getenv("REGISTRY_HOST");
+            this.host = System.getenv("REGISTRY_HOST");
             //Puerto de la maquina del cliente
-            port = System.getenv("REGISTRY_PORT");
+            this.port = System.getenv("REGISTRY_PORT");
             //Tamaño de los bloques en el envio
-            block_size = System.getenv("BLOCKSIZE");
-            Naming.lookup("//" + host + ":" + port + "/Banco");
+            this.block_size = System.getenv("BLOCKSIZE");
+    }
+
+    public Remote getLookup(){
+        try{
+        return Naming.lookup("//" + host + ":" + port + "/Banco");
         }
         catch (RemoteException e) {
             System.err.println("Error de comunicacion: " + e.toString());
+            return null;
         }
         catch (Exception e) {
             System.err.println("Excepcion en ClienteBanco:");
             e.printStackTrace();
+            return null;
         }
     }
 
