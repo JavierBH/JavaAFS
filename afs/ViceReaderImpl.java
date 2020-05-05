@@ -8,7 +8,7 @@ import java.rmi.*;
 import java.rmi.server.*;
 
 public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
-    private static final String AFSDir = "AFSDir/"; // Directorio en el que se encuentran los ficheros del server
+    private static final String AFSDir = "./AFSDir/"; // Directorio en el que se encuentran los ficheros del server
     private RandomAccessFile f;
     /**
      * Constructor de la clase
