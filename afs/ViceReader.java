@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.rmi.*;
 
 public interface ViceReader extends Remote {
-    public byte[] read(int tam,int pos) throws RemoteException, IOException;
+    public byte[] read(int tam) throws RemoteException, IOException;
     public void close() throws RemoteException,IOException;
-    public int getLengthFile() throws IOException;
+    public long getLengthFile() throws IOException;
     /* añada los métodos remotos que requiera */
 }       
 

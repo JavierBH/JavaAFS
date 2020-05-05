@@ -10,40 +10,61 @@ public class VenusFile {
     private String fileName;
     private String mode;
     private Venus venus; 
-    private RandomAccessFile f;
+    private RandomAccessFile rf;
+    private File f;
 
     //Constructor de la clase
-    //RECORDATORIO: SE TRABAJA SOBRE LA COPIA LOCAL, SI ESTA NO EXISTE SE DEBE DESCARGAR
     public VenusFile(Venus venus, String fileName, String mode) throws RemoteException, IOException, FileNotFoundException {
         this.venus = venus;
         this.fileName = fileName;
         this.mode = mode; 
+        //El fichero se abre en modo r
+        if(mode.equals("r")){
         try{
             //Se comprueba si el fichero esta en cache
-            this.f = new RandomAccessFile(cacheDir + fileName, mode);
+                this.rf = new RandomAccessFile(cacheDir + fileName, mode);
         } catch(FileNotFoundException e){
             //Si no esta en cache se descarga
-            Vice download_file = (Vice)this.venus.getLookup();
-            //Se descarga el fichero
-            ViceReader vr = download_file.download(this.fileName,(int)this.venus.getBlockSize());
-            byte [] fichero = new byte [vr.getLengthFile()]; 
-            //Se descargan todos los bloques del fichero
-            for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
-                vr.read(venus.getBlockSize(), i);
-            }
-            //Se escribe el fichero
-            f.write(fichero);
-            f.setLength(vr.getLengthFile());
-            //Se abre el fichero
-            this.f = new RandomAccessFile(cacheDir + fileName, mode);
+            cache_file_r();
         }
+        //El fichero se abre en modo rw
+    }else{
+        try{
+            //Se comprueba si el fichero esta en cache
+                this.rf = new RandomAccessFile(cacheDir + fileName, mode);
+        } catch(FileNotFoundException e){
+            //Si no esta en cache se crea
+            f = new File(cacheDir + fileName);
+        }
+        }
+    }
+
+    private void cache_file_r() throws IOException {
+        ViceReader vr = this.venus.getSrv().download(this.fileName,(int)this.venus.getBlockSize());
+        if(vr==null)
+            return;
+        f = new File(cacheDir + fileName);
+        FileOutputStream fos = new FileOutputStream(f);
+        //Se descargan todos los bloques del fichero
+        byte[] fichero;
+        for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
+            //Se escribe el fichero
+            fichero = vr.read(venus.getBlockSize());
+            if(fichero == null)
+                break;
+            //Se escriben los bytes necesarios en el en el output stream en la posicion indicada
+            fos.write(fichero);
+        }
+        vr.close();
+        fos.close();
+        //Se abre el fichero
+        this.rf = new RandomAccessFile(cacheDir + fileName, mode);
     }
 
     //Esto no me queda claro si se debe hacer asi o no, pero la verdad es que tiene sentido
     public int read(byte[] b) throws RemoteException, IOException {
         int leidos;
-        f.seek(0);
-        leidos = f.read(b);
+        leidos = rf.read(b);
         return leidos;
     } 
         
@@ -51,12 +72,14 @@ public class VenusFile {
         return;
     }
     public void seek(long p) throws RemoteException, IOException {
+        rf.seek(p);
         return;
     }
     public void setLength(long l) throws RemoteException, IOException {
         return;
     }
     public void close() throws RemoteException, IOException {
+        rf.close();
         return;
     }
 }

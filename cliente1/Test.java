@@ -1,5 +1,4 @@
 // Cliente para probar el servicio.
-package cliente1;
 import java.util.*;
 import java.io.*;
 import afs.*;
