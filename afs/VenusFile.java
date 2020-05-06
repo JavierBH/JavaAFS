@@ -56,6 +56,7 @@ public class VenusFile {
         for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
             //Se escribe el fichero
             fichero = vr.read(venus.getBlockSize());
+            System.out.println(fichero.length);
             //Se escriben los bytes necesarios en el en el output stream en la posicion indicada
             fos.write(fichero);
         }
