@@ -6,7 +6,7 @@ import java.rmi.*;
 import java.io.*; 
 
 public class VenusFile {
-    public static final String cacheDir = "./Cache/";
+    public static final String cacheDir = "Cache/";
     private String fileName;
     private String mode;
     private Venus venus; 
@@ -14,6 +14,7 @@ public class VenusFile {
     private File f;
     private long seek;
    // private int modified; //Indica si el fichero se ha modificado
+
     //Constructor de la clase
     public VenusFile(Venus venus, String fileName, String mode) throws RemoteException, IOException, FileNotFoundException {
         this.venus = venus;
@@ -22,13 +23,13 @@ public class VenusFile {
         this.seek = 0;
       //  this.modified = 0;
         //El fichero se abre en modo r
-        if(mode.equals("r")){
+        if(mode.equals("rw")){
         try{
             //Se comprueba si el fichero esta en cache
                 this.rf = new RandomAccessFile(cacheDir + fileName, mode);
         } catch(FileNotFoundException e){
             //Si no esta en cache se descarga
-            cache_file_r();
+            f = new File(cacheDir + fileName);
         }
         //El fichero se abre en modo rw
     }else{
@@ -37,7 +38,8 @@ public class VenusFile {
                 this.rf = new RandomAccessFile(cacheDir + fileName, mode);
         } catch(FileNotFoundException e){
             //Si no esta en cache se crea
-            f = new File(cacheDir + fileName);
+            cache_file_r();
+            
         }
         }
     }
@@ -48,20 +50,17 @@ public class VenusFile {
         if(vr==null)
             return;
         f = new File(cacheDir + fileName);
-        RandomAccessFile raf = new RandomAccessFile(cacheDir + fileName, mode);
+        FileOutputStream fos = new FileOutputStream(f);
         //Se descargan todos los bloques del fichero
         byte[] fichero;
         for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
             //Se escribe el fichero
             fichero = vr.read(venus.getBlockSize());
-            if(fichero == null)
-                break;
             //Se escriben los bytes necesarios en el en el output stream en la posicion indicada
-            raf.write(fichero);
+            fos.write(fichero);
         }
-        
         vr.close();
-        raf.close();
+        fos.close();
         //Se abre el fichero
         this.rf = new RandomAccessFile(cacheDir + fileName, mode);
     }
@@ -91,8 +90,8 @@ public class VenusFile {
         //Si el fichero se ha modificado se sube al servidor
        /* if(modified==1)
             this.venus.getSrv().upload(fileName);
-        modified = 0;
-        rf.close();*/
+        modified = 0;*/
+        rf.close();
         return;
     }
 }

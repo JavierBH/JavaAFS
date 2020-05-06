@@ -8,7 +8,7 @@ import java.rmi.*;
 import java.rmi.server.*;
 
 public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
-    private static final String AFSDir = "./AFSDir/"; // Directorio en el que se encuentran los ficheros del server
+    private static final String AFSDir = "AFSDir/"; // Directorio en el que se encuentran los ficheros del server
     private RandomAccessFile f;
     /**
      * Constructor de la clase
@@ -31,7 +31,12 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
      * @return array de bytes correspondiente al tamaño del bloque indicado
      */
     public byte[] read(int tam) throws RemoteException, IOException {
-        byte[] file = new byte[tam];
+        byte[] file;
+        if(tam>(int)this.getLengthFile()){
+            file = new byte[(int)this.getLengthFile()];
+        }else{
+            file = new byte[tam];
+        }
         int nbytes = f.read(file);
         return nbytes<0? null:file;
     }
