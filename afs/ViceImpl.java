@@ -17,18 +17,17 @@ public class ViceImpl extends UnicastRemoteObject implements Vice {
      * @throws RemoteException
      * @throws FileNotFoundException
      */ 
-    public ViceReader download(String fileName,int tam)
-          throws RemoteException, FileNotFoundException{
-              try{
+    public ViceReader download(String fileName,int tam) throws RemoteException, FileNotFoundException{
+        try{
             ViceReaderImpl vr = new ViceReaderImpl(fileName,tam);
             return vr;
-              } catch(FileNotFoundException e){
+        } catch(FileNotFoundException e){
                   return null;
-              }
+        }
     }
 
-    public ViceWriter upload(String fileName /* añada los parámetros que requiera */)
-          throws RemoteException {
-        return null;
+    public ViceWriter upload(String fileName,int tam) throws RemoteException, FileNotFoundException {
+              ViceWriterImpl wr = new ViceWriterImpl(fileName,tam);
+        return wr;
     }
 }
