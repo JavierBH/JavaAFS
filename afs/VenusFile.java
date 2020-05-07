@@ -21,33 +21,27 @@ public class VenusFile {
         this.fileName = fileName;
         this.mode = mode; 
         this.seek = 0;
-      //  this.modified = 0;
-        try{
-            //Se comprueba si el fichero esta en cache
-            this.rf = new RandomAccessFile(cacheDir + fileName, mode);
-        } catch(FileNotFoundException e){
-            //Si no esta en cache se descarga
-            cache_file_r();   
-            }
-            this.rf = new RandomAccessFile(cacheDir + fileName, mode);
-        }
-
-//Metodo que descarga el fichero del servidor, si el fichero no existe en servidor devuelve false
-    private boolean cache_file_r() throws IOException {
-        boolean res = true;
-        ViceReader vr = this.venus.getSrv().download(this.fileName,(int)this.venus.getBlockSize());
-        if(vr==null)
-            return true;
+        //this.modified = 0;
         f = new File(cacheDir + fileName);
+        if(!f.exists()){
+            cache_file_r();
+        }
+        this.rf = new RandomAccessFile(cacheDir + fileName, this.mode);
+    }
+//Metodo que descarga el fichero del servidor, si el fichero no existe en servidor devuelve false
+    private void cache_file_r() throws IOException {
+        ViceReader vr = this.venus.getSrv().download(this.fileName,(int)this.venus.getBlockSize());
+        if(vr==null){return;}
         FileOutputStream fos = new FileOutputStream(f);
         //Se descargan todos los bloques del fichero
         byte[] fichero;
         for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
             //Se escribe el fichero
             fichero = vr.read(venus.getBlockSize());
-            if(fichero==null){
-                res = false;
-                break;
+            if(fichero == null){
+                vr.close();
+                fos.close();
+                return;
             }
             //Se escriben los bytes necesarios en el en el output stream en la posicion indicada
             fos.write(fichero);
@@ -55,7 +49,7 @@ public class VenusFile {
         vr.close();
         fos.close();
         //Se abre el fichero
-        return res;
+        return;
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
