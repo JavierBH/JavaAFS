@@ -22,33 +22,22 @@ public class VenusFile {
         this.mode = mode; 
         this.seek = 0;
       //  this.modified = 0;
-        //El fichero se abre en modo r
-        if(mode.equals("rw")){
         try{
             //Se comprueba si el fichero esta en cache
-                this.rf = new RandomAccessFile(cacheDir + fileName, mode);
+            this.rf = new RandomAccessFile(cacheDir + fileName, mode);
         } catch(FileNotFoundException e){
             //Si no esta en cache se descarga
-            f = new File(cacheDir + fileName);
+            cache_file_r();   
+            }
+            this.rf = new RandomAccessFile(cacheDir + fileName, mode);
         }
-        //El fichero se abre en modo rw
-    }else{
-        try{
-            //Se comprueba si el fichero esta en cache
-                this.rf = new RandomAccessFile(cacheDir + fileName, mode);
-        } catch(FileNotFoundException e){
-            //Si no esta en cache se crea
-            cache_file_r();
-            
-        }
-        }
-    }
 
-//Metodo que descarga el fichero del servidor
-    private void cache_file_r() throws IOException {
+//Metodo que descarga el fichero del servidor, si el fichero no existe en servidor devuelve false
+    private boolean cache_file_r() throws IOException {
+        boolean res = true;
         ViceReader vr = this.venus.getSrv().download(this.fileName,(int)this.venus.getBlockSize());
         if(vr==null)
-            return;
+            return true;
         f = new File(cacheDir + fileName);
         FileOutputStream fos = new FileOutputStream(f);
         //Se descargan todos los bloques del fichero
@@ -56,19 +45,21 @@ public class VenusFile {
         for(int i = 0; i<vr.getLengthFile();i = i +venus.getBlockSize()){
             //Se escribe el fichero
             fichero = vr.read(venus.getBlockSize());
-            System.out.println(fichero.length);
+            if(fichero==null){
+                res = false;
+                break;
+            }
             //Se escriben los bytes necesarios en el en el output stream en la posicion indicada
             fos.write(fichero);
         }
         vr.close();
         fos.close();
         //Se abre el fichero
-        this.rf = new RandomAccessFile(cacheDir + fileName, mode);
+        return res;
     }
 
     public int read(byte[] b) throws RemoteException, IOException {
         int leidos;
-        rf.seek(seek);
         leidos = rf.read(b);
         return leidos;
     } 

@@ -35,15 +35,17 @@ public class ViceReaderImpl extends UnicastRemoteObject implements ViceReader {
     public byte[] read(int tam) throws RemoteException, IOException {
         byte[] file;
         this.nBytes += tam;
+        //Si el tamaño de bloque es mayor que el del fichero
         if(tam>(int)this.getLengthFile()){
             file = new byte[(int)this.getLengthFile()];
+        //Si el tamaño de bloque es mayor que el numero de bytes leidos
         }else if(nBytes>(int)this.getLengthFile()){
             file = new byte[tam-(nBytes-(int)this.getLengthFile())];
-            System.err.println(file.length);
         }
         else{
             file = new byte[tam];
         }
+        //Se lee del fichero
         int nbytes = f.read(file);
         return nbytes<0? null:file;
     }
