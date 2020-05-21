@@ -9,7 +9,8 @@ public class VenusFile {
     public static final String cacheDir = "Cache/";
     private String fileName;
     private String mode;
-    private Venus venus; 
+    private Venus venus;
+    private File f; 
     private RandomAccessFile rf;
     private boolean modified; //Indica si el fichero se ha modificado
 
@@ -19,15 +20,15 @@ public class VenusFile {
         this.fileName = fileName;
         this.mode = mode; 
         this.modified = false;
-        File f = new File(cacheDir + fileName);
+        f = new File(cacheDir + fileName);
         if(!f.exists()){
-            cache_file_r(f);
+            cache_file_r();
         }
         this.rf = new RandomAccessFile(cacheDir + fileName, this.mode);
     }
 
 //Metodo que descarga el fichero del servidor, si el fichero no existe en servidor devuelve false
-    private void cache_file_r(File f) throws IOException {
+    private void cache_file_r() throws IOException {
         ViceReader vr = this.venus.getSrv().download(this.fileName,(int)this.venus.getBlockSize());
         if(vr==null){return;}
         FileOutputStream fos = new FileOutputStream(f);
