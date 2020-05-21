@@ -11,7 +11,6 @@ public class VenusFile {
     private String mode;
     private Venus venus; 
     private RandomAccessFile rf;
-    private File f;
     private boolean modified; //Indica si el fichero se ha modificado
 
     //Constructor de la clase
@@ -20,15 +19,15 @@ public class VenusFile {
         this.fileName = fileName;
         this.mode = mode; 
         this.modified = false;
-        f = new File(cacheDir + fileName);
+        File f = new File(cacheDir + fileName);
         if(!f.exists()){
-            cache_file_r();
+            cache_file_r(f);
         }
         this.rf = new RandomAccessFile(cacheDir + fileName, this.mode);
     }
 
 //Metodo que descarga el fichero del servidor, si el fichero no existe en servidor devuelve false
-    private void cache_file_r() throws IOException {
+    private void cache_file_r(File f) throws IOException {
         ViceReader vr = this.venus.getSrv().download(this.fileName,(int)this.venus.getBlockSize());
         if(vr==null){return;}
         FileOutputStream fos = new FileOutputStream(f);
@@ -76,24 +75,29 @@ public class VenusFile {
         //Si el fichero se ha modificado se sube al servidor
         if(this.mode.equals("rw") && modified){
             modified = false;
-            ViceWriter wr = this.venus.getSrv().upload(fileName,this.venus.getBlockSize());
+            ViceWriter wr = this.venus.getSrv().upload(fileName,rf.length());
             //Se descargan todos los bloques del fichero
-            byte[] b;
-            long tam_fich = f.length();
+            long tam_fich = rf.length();
+            rf.seek(0);
+            //Se vacia el fichero del servidor
+            wr.removeContent();
+            //Se lee el fichero por bloques
             for(int i = 0; i<tam_fich;i = i +venus.getBlockSize()){
-                //Se escribe el fichero
+                byte[] b;
                 if(venus.getBlockSize()>(int)tam_fich){
                     b = new byte[(int)tam_fich];
                     //Si el tamaño de bloque es mayor que el numero de bytes leidos
-                }else if(i>(int)venus.getBlockSize()){
-                    b = new byte[venus.getBlockSize()-(i-(int)tam_fich)];
+                }else if((i+venus.getBlockSize())>(int)tam_fich){
+                    b = new byte[(int)tam_fich-i];
                 }
                 else{
                     b = new byte[venus.getBlockSize()];
                 }
-                rf.read(b);
+                //Se lee la info del fichero y se escribe en el
+                read(b);
                 wr.write(b);
             }
+            wr.close();
         }
         rf.close();
         return;

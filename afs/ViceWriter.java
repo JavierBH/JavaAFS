@@ -9,5 +9,6 @@ public interface ViceWriter extends Remote {
     public void write(byte [] b) throws RemoteException,IOException;
     public void close() throws IOException,RemoteException;
     /* añada los métodos remotos que requiera */
+    public void removeContent() throws IOException, RemoteException;
 }       
 

@@ -3,7 +3,7 @@ import java.util.*;
 import java.io.*;
 import afs.*;
 import java.rmi.*;
-package cliente1; 
+
 
 class Test {
     static byte val = 'A'; // a escribir en fichero; incrementado en cada op.
